@@ -558,6 +558,8 @@ function saveState() {
 }
 
 function renderFromData(sections) {
+  // fix empty theme (legacy data)
+  sections = sections.map(s => ({ ...s, theme: s.theme || s.title }));
   const container = document.getElementById('sections');
   container.innerHTML = sections.map(sec => `
     <div class="section${sec.extraClass ? ' ' + sec.extraClass : ''}" data-theme="${sec.theme}">
