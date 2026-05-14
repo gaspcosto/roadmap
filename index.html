@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roadmap — Costockage 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root {
-    --pink:       #FF3E8A; 
+    --pink:       #FF3E8A;
     --pink-dim:   #FFD6E8;
     --bg:         #F7F6F3;
     --ink:        #111110;
@@ -202,7 +204,7 @@
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
-    <span class="brand-name">Roadmap<span>Gaspard</span></span> 
+    <span class="brand-name">Road<span>map</span></span>
     <span class="brand-sub">CoStockage · 2026</span>
   </div>
   <span class="topbar-meta">May 2026</span>
@@ -393,9 +395,10 @@ function setStatus(sel) {
   item.dataset.status = sel.value;
   sel.className = 'status-select ' + sel.value;
   updateStats();
+  saveState();
 }
 
-// ── EXPAND (arrow button or click on row) ──
+// ── EXPAND ──
 document.addEventListener('click', e => {
   if (e.target.closest('.expand-btn')) {
     e.stopPropagation();
@@ -418,6 +421,7 @@ document.addEventListener('click', e => {
   if (editing) {
     textEl.contentEditable = 'false';
     btn.textContent = '✎';
+    saveState();
   } else {
     textEl.contentEditable = 'true';
     textEl.focus();
@@ -454,23 +458,30 @@ function makeItemHTML(text = 'Nouvel item…', status = 'todo', editing = true) 
     </div>`;
 }
 
-document.querySelectorAll('.add-item-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const section = btn.closest('.section');
-    const list = section.querySelector('.items');
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = makeItemHTML();
-    const newItem = wrapper.firstElementChild;
-    list.appendChild(newItem);
-    initDrag(newItem);
-    initListDrop(list);
-    const textEl = newItem.querySelector('.item-text');
-    textEl.focus();
-    const r = document.createRange(), s = window.getSelection();
-    r.selectNodeContents(textEl); s.removeAllRanges(); s.addRange(r);
-    refreshCount(section);
-    updateStats();
-  });
+// delegated so it works after loadState() rebuilds the DOM
+document.getElementById('sections').addEventListener('click', e => {
+  const btn = e.target.closest('.add-item-btn');
+  if (!btn) return;
+  const section = btn.closest('.section');
+  const list = section.querySelector('.items');
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = makeItemHTML();
+  const newItem = wrapper.firstElementChild;
+  list.appendChild(newItem);
+  initDrag(newItem);
+  initListDrop(list);
+  const textEl = newItem.querySelector('.item-text');
+  textEl.focus();
+  const r = document.createRange(), s = window.getSelection();
+  r.selectNodeContents(textEl); s.removeAllRanges(); s.addRange(r);
+  refreshCount(section);
+  updateStats();
+  saveState();
+});
+
+// ── NOTES AUTO-SAVE ──
+document.addEventListener('input', e => {
+  if (e.target.classList.contains('notes-input')) saveState();
 });
 
 // ── FILTER ──
@@ -511,7 +522,64 @@ function updateStats() {
   document.getElementById('stat-blocked').textContent = blocked;
 }
 
-updateStats();
+// ── PERSIST (Firebase) ──
+// TODO: replace these values with your Firebase project config
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyA1RupWmleuq7LOiXa5XMZ8O0ssZV-DvLA",
+  authDomain:        "roadmap-gaspard.firebaseapp.com",
+  databaseURL:       "https://roadmap-gaspard-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "roadmap-gaspard",
+  storageBucket:     "roadmap-gaspard.firebasestorage.app",
+  messagingSenderId: "321889579857",
+  appId:             "1:321889579857:web:5b1f3d3f371883c44d9970"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database().ref('roadmap');
+const sessionId = Math.random().toString(36).slice(2);
+
+function collectSections() {
+  return [...document.querySelectorAll('.section')].map(sec => ({
+    title: sec.querySelector('.section-title').textContent,
+    theme: sec.dataset.theme,
+    extraClass: [...sec.classList].filter(c => !['section','hidden'].includes(c)).join(' '),
+    items: [...sec.querySelectorAll('.item')].map(item => ({
+      text: item.querySelector('.item-text').innerHTML,
+      status: item.dataset.status,
+      notes: item.querySelector('.notes-input').value
+    }))
+  }));
+}
+
+function saveState() {
+  const sections = collectSections();
+  localStorage.setItem('roadmap-2026', JSON.stringify(sections));
+  db.set({ sessionId, sections });
+}
+
+function renderFromData(sections) {
+  const container = document.getElementById('sections');
+  container.innerHTML = sections.map(sec => `
+    <div class="section${sec.extraClass ? ' ' + sec.extraClass : ''}" data-theme="${sec.theme}">
+      <div class="section-header">
+        <span class="section-title">${sec.title}</span>
+        <span class="section-count">${sec.items.length}</span>
+      </div>
+      <div class="items">
+        ${sec.items.map(item => makeItemHTML(item.text, item.status, false)).join('')}
+      </div>
+      <button class="add-item-btn">+ Ajouter un item</button>
+    </div>
+  `).join('');
+  sections.forEach((sec, si) => {
+    document.querySelectorAll('.section')[si]?.querySelectorAll('.notes-input').forEach((inp, ii) => {
+      inp.value = sec.items[ii]?.notes || '';
+    });
+  });
+  document.querySelectorAll('.item').forEach(initDrag);
+  document.querySelectorAll('.items').forEach(initListDrop);
+  updateStats();
+}
 
 // ── DRAG & DROP ──
 let dragItem = null;
@@ -521,7 +589,6 @@ function initDrag(item) {
   item.dataset.dragReady = '1';
   item.setAttribute('draggable', 'true');
 
-  // inject handle if missing
   const main = item.querySelector('.item-main');
   if (!main.querySelector('.drag-handle')) {
     const h = document.createElement('button');
@@ -580,12 +647,23 @@ function initListDrop(list) {
     refreshCount(fromSection);
     if (toSection !== fromSection) refreshCount(toSection);
     updateStats();
+    saveState();
   });
 }
 
-// init existing items & lists
-document.querySelectorAll('.item').forEach(initDrag);
-document.querySelectorAll('.items').forEach(initListDrop);
+// ── INIT ──
+// Render immediately from localStorage cache (fast load), then Firebase syncs on top
+const localRaw = localStorage.getItem('roadmap-2026');
+if (localRaw) renderFromData(JSON.parse(localRaw));
+else { updateStats(); document.querySelectorAll('.item').forEach(initDrag); document.querySelectorAll('.items').forEach(initListDrop); }
+
+// Real-time Firebase listener — skips re-render for our own saves
+db.on('value', snapshot => {
+  const val = snapshot.val();
+  if (!val || val.sessionId === sessionId) return;
+  renderFromData(val.sections);
+  localStorage.setItem('roadmap-2026', JSON.stringify(val.sections));
+});
 </script>
 </body>
 </html>
