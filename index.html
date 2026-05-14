@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap — Costockage 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink:       #FF3E8A;
+    --pink-dim:   #FFD6E8;
+    --bg:         #F7F6F3;
+    --ink:        #111110;
+    --muted:      #999;
+    --border:     #E2E0D9;
+    --card:       #FFFFFF;
+    --green:      #1A9E6A;
+    --green-bg:   #EBF8F3;
+    --amber:      #C97B00;
+    --amber-bg:   #FFF8E6;
+    --red:        #D63B3B;
+    --red-bg:     #FDEAEA;
+    --grey-bg:    #F0EFEC;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 22px; letter-spacing: -0.5px; color: #fff; }
+  .brand-name span { color: var(--pink); }
+  .brand-sub { font-size: 10px; letter-spacing: 0.12em; color: #666; text-transform: uppercase; }
+  .topbar-meta { font-size: 11px; color: #666; letter-spacing: 0.06em; }
+
+  /* ── FILTER BAR ── */
+  .filterbar {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 0 32px; display: flex; align-items: center; gap: 6px;
+    overflow-x: auto; scrollbar-width: none; height: 44px;
+  }
+  .filterbar::-webkit-scrollbar { display: none; }
+  .filter-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; margin-right: 4px; }
+  .filter-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 3px 10px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    white-space: nowrap; transition: all 0.12s; letter-spacing: 0.04em;
+  }
+  .filter-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .filter-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+  /* ── STATS BAR ── */
+  .statsbar { padding: 20px 32px 0; max-width: 964px; margin: 0 auto; }
+  .stats-inner { display: flex; }
+  .stat {
+    flex: 1; padding: 14px 16px;
+    border: 1px solid var(--border); background: var(--card); border-right: none;
+  }
+  .stat:last-child { border-right: 1px solid var(--border); }
+  .stat-val { font-family: 'Playfair Display', serif; font-size: 26px; line-height: 1; }
+  .stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.red   { color: var(--red); }
+
+  /* ── MAIN ── */
+  .page { padding: 0 32px; max-width: 900px; margin: 0 auto; }
+  .sections { display: flex; flex-direction: column; gap: 20px; }
+  .section.hidden { display: none; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 15px; letter-spacing: -0.2px; }
+  .section-count { font-size: 10px; color: #fff; background: var(--ink); padding: 1px 7px; letter-spacing: 0.05em; }
+  .section.deprio .section-header { border-bottom-color: var(--muted); }
+  .section.deprio .section-title  { color: var(--muted); }
+  .section.deprio .section-count  { background: var(--muted); }
+
+  /* ── ADD BUTTON ── */
+  .add-item-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    background: none; border: 1px dashed var(--border);
+    width: 100%; padding: 8px 14px; text-align: left;
+    cursor: pointer; transition: all 0.12s; letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+  .add-item-btn:hover { border-color: var(--pink); color: var(--pink); background: #FFF5F9; }
+
+  /* ── ITEMS ── */
+  .items { display: flex; flex-direction: column; gap: 4px; }
+  .item {
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid transparent; transition: border-color 0.12s;
+  }
+  .item:hover { border-left-color: var(--pink); }
+  .item.slash  { opacity: 0.4; }
+
+  .item-main {
+    display: grid; grid-template-columns: 14px 8px 1fr auto;
+    align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--pink); flex-shrink: 0;
+  }
+  .item.slash .dot {
+    background: none; border-bottom: 2px solid var(--muted);
+    border-radius: 0; width: 10px; height: 0;
+  }
+
+  .item-text { font-size: 12.5px; line-height: 1.5; min-width: 0; }
+  .item-text s { color: #ccc; text-decoration-color: #ccc; }
+  .item-text[contenteditable="true"] {
+    outline: none; border-bottom: 1px dashed var(--pink); padding-bottom: 1px;
+  }
+
+  .item-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  /* ── STATUS SELECT ── */
+  .status-select {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 5px; border: 1px solid; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    outline: none; border-radius: 0;
+  }
+  .status-select.todo    { color: #777;        border-color: var(--border); background: var(--grey-bg); }
+  .status-select.doing   { color: var(--amber); border-color: var(--amber);  background: var(--amber-bg); }
+  .status-select.blocked { color: var(--red);   border-color: var(--red);    background: var(--red-bg); }
+  .status-select.done-s  { color: var(--green); border-color: var(--green);  background: var(--green-bg); }
+
+  /* ── ICON BTNS ── */
+  .edit-btn, .expand-btn {
+    background: none; border: none; cursor: pointer;
+    color: #ccc; font-size: 12px; padding: 0 2px;
+    transition: color 0.12s; line-height: 1; flex-shrink: 0;
+  }
+  .edit-btn:hover   { color: var(--pink); }
+  .expand-btn:hover { color: var(--pink); }
+  .item.open .expand-btn { transform: rotate(180deg); color: var(--pink); }
+
+  /* ── DRAG & DROP ── */
+  .drag-handle {
+    background: none; border: none; padding: 0; cursor: grab;
+    color: #ccc; font-size: 14px; line-height: 1; flex-shrink: 0;
+    opacity: 0; transition: opacity 0.12s;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .item:hover .drag-handle { opacity: 1; }
+  .item.dragging { opacity: 0.35; }
+  .item.drop-before { box-shadow: 0 -2px 0 var(--pink); }
+
+  /* ── NOTES PANEL ── */
+  .notes-panel {
+    display: none; border-top: 1px solid var(--border);
+    padding: 10px 14px 12px 34px; background: #FAFAF8;
+  }
+  .item.open .notes-panel { display: block; }
+  .notes-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 5px; }
+  .notes-input {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--ink); background: transparent; border: none;
+    border-bottom: 1px dashed var(--border); width: 100%;
+    padding: 4px 0; outline: none; resize: none; min-height: 32px; line-height: 1.5;
+  }
+  .notes-input:focus { border-bottom-color: var(--pink); }
+  .notes-input::placeholder { color: #ccc; }
+
+  .empty-state { display: none; text-align: center; padding: 40px; color: var(--muted); font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .topbar, .filterbar, .page { padding-left: 16px; padding-right: 16px; }
+    .statsbar { padding: 16px 16px 0; }
+    .stat-val { font-size: 20px; }
+    .stats-inner { flex-wrap: wrap; }
+    .stat { min-width: 50%; }
+    .stat:nth-child(2) { border-right: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-name">Road<span>map</span></span>
+    <span class="brand-sub">CoStockage · 2026</span>
+  </div>
+  <span class="topbar-meta">May 2026</span>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filterbar">
+  <span class="filter-label">Thème</span>
+  <button class="filter-btn active" data-filter="all">Tout</button>
+  <button class="filter-btn" data-filter="Cockpit">Cockpit</button>
+  <button class="filter-btn" data-filter="Data Marketing">Data MKT</button>
+  <button class="filter-btn" data-filter="LBC">LBC</button>
+  <button class="filter-btn" data-filter="Data Sales">Data Sales</button>
+  <button class="filter-btn" data-filter="LC App">LC App</button>
+  <button class="filter-btn" data-filter="Dataviz Produit">Dash Produit</button>
+  <button class="filter-btn" data-filter="App Client">App Client</button>
+  <button class="filter-btn" data-filter="Trello">Trello</button>
+  <button class="filter-btn" data-filter="Uptime">Uptime</button>
+  <button class="filter-btn" data-filter="SAV">SAV</button>
+  <button class="filter-btn" data-filter="Transversal">Transversal</button>
+</div>
+
+<!-- STATS -->
+<div class="statsbar">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-val green" id="stat-done">0</div><div class="stat-lbl">Fait</div></div>
+    <div class="stat"><div class="stat-val amber" id="stat-doing">0</div><div class="stat-lbl">En cours</div></div>
+    <div class="stat"><div class="stat-val red" id="stat-blocked">0</div><div class="stat-lbl">Bloqué</div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="page" style="margin-top:24px">
+<div class="sections" id="sections">
+
+  <!--  -->
+  <div class="section" data-theme="">
+    <div class="section-header">
+      <span class="section-title">Cockpit</span>
+      <span class="section-count">3</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Data cleaning &amp; import de la donnée Intercom</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Cycle de vie d'un lead, règles des statuts &amp; lead nurturing</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Flowrise — points équipes sur les briques utiles pour le Cockpit</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- DATA MARKETING -->
+  <div class="section" data-theme="Data Marketing">
+    <div class="section-header">
+      <span class="section-title">Data Marketing</span>
+      <span class="section-count">5</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>90j + split</s> + ajout costs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Rapport trimestriel — anti burn-out</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Tracking devis — UTMs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Leads : All — request direct l'API Costockage</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">LPs SEA — analyse perf de Damien +</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- LBC -->
+  <div class="section" data-theme="LBC">
+    <div class="section-header">
+      <span class="section-title">LBC</span>
+      <span class="section-count">2</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Matching appels LBC — scripts avec Claude</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">LBC Annonces — analyse hebdo des annonces</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- DATA SALES -->
+  <div class="section" data-theme="Data Sales">
+    <div class="section-header">
+      <span class="section-title">Data Sales</span>
+      <span class="section-count">4</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Intercom — fonctionnalités en plus avec Vercel</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Datachecks automatisés — <s>matching OpenAI</s></div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">NBA 28j</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Spams</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- LC APP -->
+  <div class="section" data-theme="LC App">
+    <div class="section-header">
+      <span class="section-title">LC App</span>
+      <span class="section-count">2</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="blocked"><div class="item-main"><div class="dot"></div><div class="item-text">Bloquer validation si LC pas complet</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select blocked" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing">En cours</option><option value="blocked" selected>Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Adapter à Keynexio</s> — attente retour sur textes</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- DATAVIZ PRODUIT -->
+  <div class="section" data-theme="Dataviz Produit">
+    <div class="section-header">
+      <span class="section-title">Dataviz Produit</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Check "tout seul" sur 1 semaine</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- APP CLIENT -->
+  <div class="section" data-theme="App Client">
+    <div class="section-header">
+      <span class="section-title">App Client</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">v1 dispo Keynexio</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- TRELLO -->
+  <div class="section" data-theme="Trello">
+    <div class="section-header">
+      <span class="section-title">Trello</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Passer dans BQ — sheets instable</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- UPTIME -->
+  <div class="section" data-theme="Uptime">
+    <div class="section-header">
+      <span class="section-title">Uptime</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Relance Bilan</s> — en cours avec Astrid à Cranves</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- SAV -->
+  <div class="section" data-theme="SAV">
+    <div class="section-header">
+      <span class="section-title">SAV</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Quelle data garder dans BQ</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+  <!-- TRANSVERSAL -->
+  <div class="section" data-theme="Transversal">
+    <div class="section-header">
+      <span class="section-title">Transversal</span>
+      <span class="section-count">1</span>
+    </div>
+    <div class="items">
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Documentation systématique + tutos erreurs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+    </div>
+    <button class="add-item-btn">+ Ajouter un item</button>
+  </div>
+
+</div><!-- /sections -->
+<div class="empty-state" id="empty-state">Aucun item dans cette catégorie.</div>
+</div><!-- /page -->
+
+<script>
+// ── STATUS SELECT ──
+function setStatus(sel) {
+  const item = sel.closest('.item');
+  item.dataset.status = sel.value;
+  sel.className = 'status-select ' + sel.value;
+  updateStats();
+}
+
+// ── EXPAND (arrow button or click on row) ──
+document.addEventListener('click', e => {
+  if (e.target.closest('.expand-btn')) {
+    e.stopPropagation();
+    e.target.closest('.item').classList.toggle('open');
+    return;
+  }
+  const main = e.target.closest('.item-main');
+  if (main && !e.target.closest('button') && !e.target.closest('select') && !e.target.closest('[contenteditable="true"]')) {
+    main.closest('.item').classList.toggle('open');
+  }
+});
+
+// ── INLINE EDIT ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.edit-btn');
+  if (!btn) return;
+  e.stopPropagation();
+  const textEl = btn.closest('.item-main').querySelector('.item-text');
+  const editing = textEl.contentEditable === 'true';
+  if (editing) {
+    textEl.contentEditable = 'false';
+    btn.textContent = '✎';
+  } else {
+    textEl.contentEditable = 'true';
+    textEl.focus();
+    btn.textContent = '✓';
+    const r = document.createRange(), s = window.getSelection();
+    r.selectNodeContents(textEl); r.collapse(false);
+    s.removeAllRanges(); s.addRange(r);
+  }
+});
+
+// ── ADD ITEM ──
+function makeItemHTML(text = 'Nouvel item…', status = 'todo', editing = true) {
+  const statuses = ['todo','doing','blocked','done-s'];
+  const labels   = {'todo':'À faire','doing':'En cours','blocked':'Bloqué','done-s':'Fait ✓'};
+  const opts = statuses.map(v =>
+    `<option value="${v}"${v===status?' selected':''}>${labels[v]}</option>`
+  ).join('');
+  return `
+    <div class="item" data-status="${status}" draggable="true">
+      <div class="item-main">
+        <button class="drag-handle">⠿</button>
+        <div class="dot"></div>
+        <div class="item-text"${editing?' contenteditable="true"':''}>${text}</div>
+        <div class="item-right">
+          <button class="edit-btn">${editing?'✓':'✎'}</button>
+          <select class="status-select ${status}" onchange="setStatus(this)">${opts}</select>
+          <button class="expand-btn">▾</button>
+        </div>
+      </div>
+      <div class="notes-panel">
+        <div class="notes-label">Notes</div>
+        <textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea>
+      </div>
+    </div>`;
+}
+
+document.querySelectorAll('.add-item-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const section = btn.closest('.section');
+    const list = section.querySelector('.items');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = makeItemHTML();
+    const newItem = wrapper.firstElementChild;
+    list.appendChild(newItem);
+    initDrag(newItem);
+    initListDrop(list);
+    const textEl = newItem.querySelector('.item-text');
+    textEl.focus();
+    const r = document.createRange(), s = window.getSelection();
+    r.selectNodeContents(textEl); s.removeAllRanges(); s.addRange(r);
+    refreshCount(section);
+    updateStats();
+  });
+});
+
+// ── FILTER ──
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    let any = false;
+    document.querySelectorAll('.section').forEach(sec => {
+      const show = filter === 'all' || sec.dataset.theme === filter;
+      sec.classList.toggle('hidden', !show);
+      if (show) any = true;
+    });
+    document.getElementById('empty-state').style.display = any ? 'none' : 'block';
+  });
+});
+
+// ── COUNT + STATS ──
+function refreshCount(section) {
+  const n = section.querySelectorAll('.item:not(.slash)').length;
+  const badge = section.querySelector('.section-count');
+  if (badge) badge.textContent = n;
+}
+
+function updateStats() {
+  const items = document.querySelectorAll('.item:not(.slash)');
+  let done = 0, doing = 0, blocked = 0;
+  items.forEach(it => {
+    const s = it.dataset.status;
+    if (s === 'done-s')  done++;
+    if (s === 'doing')   doing++;
+    if (s === 'blocked') blocked++;
+  });
+  document.getElementById('stat-total').textContent   = items.length;
+  document.getElementById('stat-done').textContent    = done;
+  document.getElementById('stat-doing').textContent   = doing;
+  document.getElementById('stat-blocked').textContent = blocked;
+}
+
+updateStats();
+
+// ── DRAG & DROP ──
+let dragItem = null;
+
+function initDrag(item) {
+  if (item.dataset.dragReady) return;
+  item.dataset.dragReady = '1';
+  item.setAttribute('draggable', 'true');
+
+  // inject handle if missing
+  const main = item.querySelector('.item-main');
+  if (!main.querySelector('.drag-handle')) {
+    const h = document.createElement('button');
+    h.className = 'drag-handle';
+    h.textContent = '⠿';
+    main.prepend(h);
+  }
+
+  item.addEventListener('dragstart', e => {
+    dragItem = item;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => item.classList.add('dragging'), 0);
+  });
+
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+    document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+    dragItem = null;
+  });
+}
+
+function getDropTarget(list, y) {
+  const items = [...list.querySelectorAll('.item:not(.dragging)')];
+  return items.find(el => {
+    const { top, height } = el.getBoundingClientRect();
+    return y < top + height / 2;
+  }) || null;
+}
+
+function initListDrop(list) {
+  if (list.dataset.dropReady) return;
+  list.dataset.dropReady = '1';
+
+  list.addEventListener('dragover', e => {
+    e.preventDefault();
+    if (!dragItem) return;
+    document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+    const target = getDropTarget(list, e.clientY);
+    if (target) target.classList.add('drop-before');
+  });
+
+  list.addEventListener('dragleave', e => {
+    if (!list.contains(e.relatedTarget)) {
+      document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+    }
+  });
+
+  list.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!dragItem) return;
+    const fromSection = dragItem.closest('.section');
+    const toSection   = list.closest('.section');
+    const target = getDropTarget(list, e.clientY);
+    list.insertBefore(dragItem, target);
+    document.querySelectorAll('.drop-before').forEach(el => el.classList.remove('drop-before'));
+    refreshCount(fromSection);
+    if (toSection !== fromSection) refreshCount(toSection);
+    updateStats();
+  });
+}
+
+// init existing items & lists
+document.querySelectorAll('.item').forEach(initDrag);
+document.querySelectorAll('.items').forEach(initListDrop);
+</script>
+</body>
+</html>
