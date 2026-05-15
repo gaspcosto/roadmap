@@ -204,7 +204,7 @@
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
-    <span class="brand-name">Roadmap<span> Gaspard</span></span>
+    <span class="brand-name">Road<span>map</span></span>
     <span class="brand-sub">CoStockage · 2026</span>
   </div>
   <span class="topbar-meta">May 2026</span>
@@ -523,20 +523,8 @@ function updateStats() {
 }
 
 // ── PERSIST (Firebase) ──
-// TODO: replace these values with your Firebase project config
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyA1RupWmleuq7LOiXa5XMZ8O0ssZV-DvLA",
-  authDomain:        "roadmap-gaspard.firebaseapp.com",
-  databaseURL:       "https://roadmap-gaspard-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "roadmap-gaspard",
-  storageBucket:     "roadmap-gaspard.firebasestorage.app",
-  messagingSenderId: "321889579857",
-  appId:             "1:321889579857:web:5b1f3d3f371883c44d9970"
-};
-
-firebase.initializeApp(FIREBASE_CONFIG);
-const db = firebase.database().ref('roadmap');
 const sessionId = Math.random().toString(36).slice(2);
+let db = null;
 
 function collectSections() {
   return [...document.querySelectorAll('.section')].map(sec => ({
@@ -554,7 +542,7 @@ function collectSections() {
 function saveState() {
   const sections = collectSections();
   localStorage.setItem('roadmap-2026', JSON.stringify(sections));
-  db.set({ sessionId, sections });
+  if (db) db.set({ sessionId, sections });
 }
 
 function renderFromData(sections) {
@@ -654,18 +642,25 @@ function initListDrop(list) {
 }
 
 // ── INIT ──
-// Render immediately from localStorage cache (fast load), then Firebase syncs on top
+// Render immediately from localStorage cache for fast load
 const localRaw = localStorage.getItem('roadmap-2026');
 if (localRaw) renderFromData(JSON.parse(localRaw));
 else { updateStats(); document.querySelectorAll('.item').forEach(initDrag); document.querySelectorAll('.items').forEach(initListDrop); }
 
-// Real-time Firebase listener — skips re-render for our own saves
-db.on('value', snapshot => {
-  const val = snapshot.val();
-  if (!val || val.sessionId === sessionId) return;
-  renderFromData(val.sections);
-  localStorage.setItem('roadmap-2026', JSON.stringify(val.sections));
-});
+// Fetch Firebase config from Vercel env vars, then start real-time sync
+fetch('/api/config')
+  .then(r => r.json())
+  .then(config => {
+    firebase.initializeApp(config);
+    db = firebase.database().ref('roadmap');
+    db.on('value', snapshot => {
+      const val = snapshot.val();
+      if (!val || val.sessionId === sessionId) return;
+      renderFromData(val.sections);
+      localStorage.setItem('roadmap-2026', JSON.stringify(val.sections));
+    });
+  })
+  .catch(() => console.warn('Firebase config unavailable — running in local-only mode'));
 </script>
 </body>
 </html>
