@@ -214,7 +214,7 @@
 <div class="filterbar">
   <span class="filter-label">Thème</span>
   <button class="filter-btn active" data-filter="all">Tout</button>
-  <button class="filter-btn" data-filter="Cockpit">Cockpit</button>
+  <button class="filter-btn" data-filter="Console">Console</button>
   <button class="filter-btn" data-filter="Data Marketing">Data MKT</button>
   <button class="filter-btn" data-filter="LBC">LBC</button>
   <button class="filter-btn" data-filter="Data Sales">Data Sales</button>
@@ -242,15 +242,15 @@
 <div class="sections" id="sections">
 
   <!--  -->
-  <div class="section" data-theme="Cockpit">
+  <div class="section" data-theme="Console">
     <div class="section-header">
-      <span class="section-title">Cockpit</span>
+      <span class="section-title">Console</span>
       <span class="section-count">3</span>
     </div>
     <div class="items">
       <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Data cleaning &amp; import de la donnée Intercom</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
       <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Cycle de vie d'un lead, règles des statuts &amp; lead nurturing</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Flowrise — points équipes sur les briques utiles pour le Cockpit</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Flowrise — points équipes sur les briques utiles pour le Console</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -660,7 +660,7 @@ fetch('/api/config')
       localStorage.setItem('roadmap-2026', JSON.stringify(val.sections));
     });
   })
-  .catch(() => console.warn('Firebase config unavailable — running in local-only mode'));
+  .catch(() => Console.warn('Firebase config unavailable — running in local-only mode'));
 </script>
 </body>
 </html>
