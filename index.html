@@ -64,6 +64,8 @@
   }
   .filter-btn:hover { border-color: var(--pink); color: var(--pink); }
   .filter-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+  .filter-btn.star-filter { padding: 3px 8px; }
+  .filter-btn.star-filter.active { background: var(--pink); }
 
   /* ── STATS BAR ── */
   .statsbar { padding: 20px 32px 0; max-width: 964px; margin: 0 auto; }
@@ -78,6 +80,7 @@
   .stat-val.green { color: var(--green); }
   .stat-val.amber { color: var(--amber); }
   .stat-val.red   { color: var(--red); }
+  .stat-val.pink  { color: var(--pink); }
 
   /* ── MAIN ── */
   .page { padding: 0 32px; max-width: 900px; margin: 0 auto; }
@@ -111,10 +114,19 @@
   .items { display: flex; flex-direction: column; gap: 4px; }
   .item {
     background: var(--card); border: 1px solid var(--border);
-    border-left: 3px solid transparent; transition: border-color 0.12s;
+    border-left: 3px solid transparent; transition: border-color 0.12s, background 0.12s;
   }
   .item:hover { border-left-color: var(--pink); }
   .item.slash  { opacity: 0.4; }
+  .item.hidden { display: none; }
+
+  /* ── PRIORITY HIGHLIGHT ── */
+  .item.priority {
+    border-left-color: var(--pink) !important;
+    border-left-width: 4px;
+    background: linear-gradient(90deg, #FFF0F6 0%, #FFFFFF 45%);
+  }
+  .item.priority .item-text { font-weight: 500; }
 
   .item-main {
     display: grid; grid-template-columns: 14px 8px 1fr auto;
@@ -151,14 +163,18 @@
   .status-select.done-s  { color: var(--green); border-color: var(--green);  background: var(--green-bg); }
 
   /* ── ICON BTNS ── */
-  .edit-btn, .expand-btn {
+  .edit-btn, .expand-btn, .star-btn {
     background: none; border: none; cursor: pointer;
-    color: #ccc; font-size: 12px; padding: 0 2px;
-    transition: color 0.12s; line-height: 1; flex-shrink: 0;
+    color: #d8d6d0; font-size: 12px; padding: 0 2px;
+    transition: color 0.12s, transform 0.12s; line-height: 1; flex-shrink: 0;
   }
   .edit-btn:hover   { color: var(--pink); }
   .expand-btn:hover { color: var(--pink); }
   .item.open .expand-btn { transform: rotate(180deg); color: var(--pink); }
+
+  .star-btn { font-size: 14px; }
+  .star-btn:hover { color: var(--pink); transform: scale(1.15); }
+  .item.priority .star-btn { color: var(--pink); }
 
   /* ── DRAG & DROP ── */
   .drag-handle {
@@ -214,6 +230,7 @@
 <div class="filterbar">
   <span class="filter-label">Thème</span>
   <button class="filter-btn active" data-filter="all">Tout</button>
+  <button class="filter-btn star-filter" data-filter="priority" title="Prioritaires uniquement">★</button>
   <button class="filter-btn" data-filter="Console">Console</button>
   <button class="filter-btn" data-filter="Data Marketing">Data MKT</button>
   <button class="filter-btn" data-filter="LBC">LBC</button>
@@ -231,6 +248,7 @@
 <div class="statsbar">
   <div class="stats-inner">
     <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-val pink" id="stat-priority">0</div><div class="stat-lbl">★ Prio</div></div>
     <div class="stat"><div class="stat-val green" id="stat-done">0</div><div class="stat-lbl">Fait</div></div>
     <div class="stat"><div class="stat-val amber" id="stat-doing">0</div><div class="stat-lbl">En cours</div></div>
     <div class="stat"><div class="stat-val red" id="stat-blocked">0</div><div class="stat-lbl">Bloqué</div></div>
@@ -241,16 +259,16 @@
 <div class="page" style="margin-top:24px">
 <div class="sections" id="sections">
 
-  <!--  -->
+  <!-- CONSOLE -->
   <div class="section" data-theme="Console">
     <div class="section-header">
       <span class="section-title">Console</span>
       <span class="section-count">3</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Data cleaning &amp; import de la donnée Intercom</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Cycle de vie d'un lead, règles des statuts &amp; lead nurturing</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Flowrise — points équipes sur les briques utiles pour le Console</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Data cleaning &amp; import de la donnée Intercom</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Cycle de vie d'un lead, règles des statuts &amp; lead nurturing</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Flowrise — points équipes sur les briques utiles pour le Console</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -262,11 +280,11 @@
       <span class="section-count">5</span>
     </div>
     <div class="items">
-      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>90j + split</s> + ajout costs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Rapport trimestriel — anti burn-out</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Tracking devis — UTMs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Leads : All — request direct l'API Costockage</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">LPs SEA — analyse perf de Damien +</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="doing" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text"><s>90j + split</s> + ajout costs</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Rapport trimestriel — anti burn-out</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Tracking devis — UTMs</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Leads : All — request direct l'API Costockage</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">LPs SEA — analyse perf de Damien +</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -278,8 +296,8 @@
       <span class="section-count">2</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Matching appels LBC — scripts avec Claude</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">LBC Annonces — analyse hebdo des annonces</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Matching appels LBC — scripts avec Claude</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">LBC Annonces — analyse hebdo des annonces</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -291,10 +309,10 @@
       <span class="section-count">4</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Intercom — fonctionnalités en plus avec Vercel</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Datachecks automatisés — <s>matching OpenAI</s></div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">NBA 28j</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Spams</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Intercom — fonctionnalités en plus avec Vercel</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Datachecks automatisés — <s>matching OpenAI</s></div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">NBA 28j</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Spams</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -306,8 +324,8 @@
       <span class="section-count">2</span>
     </div>
     <div class="items">
-      <div class="item" data-status="blocked"><div class="item-main"><div class="dot"></div><div class="item-text">Bloquer validation si LC pas complet</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select blocked" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing">En cours</option><option value="blocked" selected>Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
-      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Adapter à Keynexio</s> — attente retour sur textes</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="blocked" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Bloquer validation si LC pas complet</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select blocked" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing">En cours</option><option value="blocked" selected>Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="doing" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Adapter à Keynexio</s> — attente retour sur textes</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -319,7 +337,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Check "tout seul" sur 1 semaine</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Check "tout seul" sur 1 semaine</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -331,7 +349,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">v1 dispo Keynexio</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">v1 dispo Keynexio</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -343,7 +361,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Passer dans BQ — sheets instable</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Passer dans BQ — sheets instable</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -355,7 +373,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="doing"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Relance Bilan</s> — en cours avec Astrid à Cranves</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="doing" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text"><s>Relance Bilan</s> — en cours avec Astrid à Cranves</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select doing" onchange="setStatus(this)"><option value="todo">À faire</option><option value="doing" selected>En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -367,7 +385,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Quelle data garder dans BQ</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Quelle data garder dans BQ</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -379,7 +397,7 @@
       <span class="section-count">1</span>
     </div>
     <div class="items">
-      <div class="item" data-status="todo"><div class="item-main"><div class="dot"></div><div class="item-text">Documentation systématique + tutos erreurs</div><div class="item-right"><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
+      <div class="item" data-status="todo" data-priority="0"><div class="item-main"><div class="dot"></div><div class="item-text">Documentation systématique + tutos erreurs</div><div class="item-right"><button class="star-btn" title="Marquer prioritaire">★</button><button class="edit-btn">✎</button><select class="status-select todo" onchange="setStatus(this)"><option value="todo" selected>À faire</option><option value="doing">En cours</option><option value="blocked">Bloqué</option><option value="done-s">Fait ✓</option></select><button class="expand-btn">▾</button></div></div><div class="notes-panel"><div class="notes-label">Notes</div><textarea class="notes-input" placeholder="Ajouter une note…" rows="2"></textarea></div></div>
     </div>
     <button class="add-item-btn">+ Ajouter un item</button>
   </div>
@@ -432,20 +450,33 @@ document.addEventListener('click', e => {
   }
 });
 
+// ── PRIORITY TOGGLE (star) ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.star-btn');
+  if (!btn) return;
+  e.stopPropagation();
+  const item = btn.closest('.item');
+  const isPrio = item.classList.toggle('priority');
+  item.dataset.priority = isPrio ? '1' : '0';
+  updateStats();
+  saveState();
+});
+
 // ── ADD ITEM ──
-function makeItemHTML(text = 'Nouvel item…', status = 'todo', editing = true) {
+function makeItemHTML(text = 'Nouvel item…', status = 'todo', editing = true, priority = false) {
   const statuses = ['todo','doing','blocked','done-s'];
   const labels   = {'todo':'À faire','doing':'En cours','blocked':'Bloqué','done-s':'Fait ✓'};
   const opts = statuses.map(v =>
     `<option value="${v}"${v===status?' selected':''}>${labels[v]}</option>`
   ).join('');
   return `
-    <div class="item" data-status="${status}" draggable="true">
+    <div class="item${priority ? ' priority' : ''}" data-status="${status}" data-priority="${priority ? '1' : '0'}" draggable="true">
       <div class="item-main">
         <button class="drag-handle">⠿</button>
         <div class="dot"></div>
         <div class="item-text"${editing?' contenteditable="true"':''}>${text}</div>
         <div class="item-right">
+          <button class="star-btn" title="Marquer prioritaire">★</button>
           <button class="edit-btn">${editing?'✓':'✎'}</button>
           <select class="status-select ${status}" onchange="setStatus(this)">${opts}</select>
           <button class="expand-btn">▾</button>
@@ -484,18 +515,35 @@ document.addEventListener('input', e => {
   if (e.target.classList.contains('notes-input')) saveState();
 });
 
-// ── FILTER ──
+// ── FILTER (theme or priority-only) ──
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const filter = btn.dataset.filter;
     let any = false;
-    document.querySelectorAll('.section').forEach(sec => {
-      const show = filter === 'all' || sec.dataset.theme === filter;
-      sec.classList.toggle('hidden', !show);
-      if (show) any = true;
-    });
+
+    if (filter === 'priority') {
+      // Show all sections, but hide non-priority items
+      document.querySelectorAll('.section').forEach(sec => {
+        let secHasPrio = false;
+        sec.querySelectorAll('.item').forEach(it => {
+          const isPrio = it.dataset.priority === '1';
+          it.classList.toggle('hidden', !isPrio);
+          if (isPrio) secHasPrio = true;
+        });
+        sec.classList.toggle('hidden', !secHasPrio);
+        if (secHasPrio) any = true;
+      });
+    } else {
+      // Reset item-level hiding, filter by theme
+      document.querySelectorAll('.item').forEach(it => it.classList.remove('hidden'));
+      document.querySelectorAll('.section').forEach(sec => {
+        const show = filter === 'all' || sec.dataset.theme === filter;
+        sec.classList.toggle('hidden', !show);
+        if (show) any = true;
+      });
+    }
     document.getElementById('empty-state').style.display = any ? 'none' : 'block';
   });
 });
@@ -509,17 +557,19 @@ function refreshCount(section) {
 
 function updateStats() {
   const items = document.querySelectorAll('.item:not(.slash)');
-  let done = 0, doing = 0, blocked = 0;
+  let done = 0, doing = 0, blocked = 0, prio = 0;
   items.forEach(it => {
     const s = it.dataset.status;
     if (s === 'done-s')  done++;
     if (s === 'doing')   doing++;
     if (s === 'blocked') blocked++;
+    if (it.dataset.priority === '1') prio++;
   });
-  document.getElementById('stat-total').textContent   = items.length;
-  document.getElementById('stat-done').textContent    = done;
-  document.getElementById('stat-doing').textContent   = doing;
-  document.getElementById('stat-blocked').textContent = blocked;
+  document.getElementById('stat-total').textContent    = items.length;
+  document.getElementById('stat-priority').textContent = prio;
+  document.getElementById('stat-done').textContent     = done;
+  document.getElementById('stat-doing').textContent    = doing;
+  document.getElementById('stat-blocked').textContent  = blocked;
 }
 
 // ── PERSIST (Firebase) ──
@@ -534,7 +584,8 @@ function collectSections() {
     items: [...sec.querySelectorAll('.item')].map(item => ({
       text: item.querySelector('.item-text').innerHTML,
       status: item.dataset.status,
-      notes: item.querySelector('.notes-input').value
+      notes: item.querySelector('.notes-input').value,
+      priority: item.dataset.priority === '1'
     }))
   }));
 }
@@ -556,7 +607,7 @@ function renderFromData(sections) {
         <span class="section-count">${sec.items.length}</span>
       </div>
       <div class="items">
-        ${sec.items.map(item => makeItemHTML(item.text, item.status, false)).join('')}
+        ${sec.items.map(item => makeItemHTML(item.text, item.status, false, item.priority || false)).join('')}
       </div>
       <button class="add-item-btn">+ Ajouter un item</button>
     </div>
@@ -660,7 +711,7 @@ fetch('/api/config')
       localStorage.setItem('roadmap-2026', JSON.stringify(val.sections));
     });
   })
-  .catch(() => Console.warn('Firebase config unavailable — running in local-only mode'));
+  .catch(() => console.warn('Firebase config unavailable — running in local-only mode'));
 </script>
 </body>
 </html>
